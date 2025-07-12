@@ -15,38 +15,34 @@ on:
 # Define the jobs that will run as part of this workflow
 jobs:
   build-and-test:
-    # Name of the runner environment. Ubuntu is common for CI.
     runs-on: ubuntu-latest
 
-    # Steps define the sequence of tasks to be executed
     steps:
-      # Step 1: Checkout the repository code
       - name: Checkout code
-        uses: actions/checkout@v4 # Uses a pre-built action to checkout your repo
+        uses: actions/checkout@v4
 
       # --- Backend (Java/Maven) Build and Test ---
       - name: Set up JDK 24
         uses: actions/setup-java@v4
         with:
-          java-version: '24' # Specify Java 24
-          distribution: 'temurin' # Recommended distribution for OpenJDK
-          cache: 'maven' # Cache Maven dependencies for faster builds
+          java-version: '24'
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build and Test Backend
         run: |
-          # Navigate into the backend directory
           cd backend
-          # Build the Maven project and run tests
-          # '--batch-mode' for non-interactive execution
-          # '-Dspring.profiles.active=test' to ensure H2 profile is used for tests
           mvn clean install --batch-mode -Dspring.profiles.active=test
 
       # --- Frontend (Angular/Node.js) Build and Test ---
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Use a stable LTS Node.js version compatible with Angular
-          cache: 'npm' # Cache npm dependencies for faster installs
+          node-version: '20'
+          cache: 'npm'
+          # ADD THIS LINE: Specify the path to your package-lock.json
+          cache-dependency-path: frontend/package-lock.json # <--- ADD THIS LINE
+        # The path is relative to the repository root
 
       - name: Install Frontend Dependencies
         run: |
@@ -56,7 +52,4 @@ jobs:
       - name: Run Frontend Tests
         run: |
           cd frontend
-          # Run Angular tests in headless mode (no browser UI)
-          # '--watch=false' to run tests once and exit
-          # '--browsers=ChromeHeadless' to use a headless Chrome browser
           ng test --watch=false --browsers=ChromeHeadless
