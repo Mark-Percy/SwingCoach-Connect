@@ -52,4 +52,4 @@ jobs:
       - name: Run Frontend Tests
         run: |
           cd frontend
-          ng test --watch=false --browsers=ChromeHeadless
+          npx ng test --watch=false --browsers=ChromeHeadless
