@@ -4,7 +4,7 @@ import com.swingcoach.swingcoach_connect.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles; // Import this
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,12 +13,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-// This annotation tells Spring to activate the 'test' profile for this test class.
-// It will then pick up application-test.properties.
 @ActiveProfiles("test")
-// Remove @AutoConfigureTestDatabase(replace = Replace.NONE)
-// By default, @DataJpaTest will replace the datasource with an in-memory one
-// unless you explicitly tell it not to. We want it to replace it now.
 class UserRepositoryTest {
 
     @Autowired
