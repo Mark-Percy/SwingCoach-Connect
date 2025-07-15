@@ -8,6 +8,9 @@ export interface User {
 
 export interface UserRegistration extends User {
     password: string;
-    confirmPassord: string;
+}
+
+export interface AuthResponse {
+    message: string;
 }
 
