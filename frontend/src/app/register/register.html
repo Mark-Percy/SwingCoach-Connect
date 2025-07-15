@@ -1,0 +1,18 @@
+<h3>Register</h3>
+<form (ngSubmit)="submitRegistration()" [formGroup]="registerForm">
+    <label for="email">Email</label>
+    <input formControlName="email" type="email" name="email">
+    <label for="password">Password</label>
+    <input formControlName="password" type="password" name="password">
+    <label for="confirmPassword">Confirm Password</label>
+    <input formControlName="confirmPassword" type="password" name="confirmPassword">
+    <label for="firstName">First Name</label>
+    <input formControlName="firstName" type="text" name="firstName">
+    <label for="lastName">Last Name</label>
+    <input formControlName="lastName" type="text" name="lastName">
+    <label for="phoneNumber">Phone Number</label>
+    <input formControlName="phoneNumber" type="text" name="phoneNumber">
+    <label for="dateOfBirth">DOB</label>
+    <input formControlName="dateOfBirth" type="date" name="dateOfBirth">
+    <button type="submit" [disabled]="this.disableSubmit">Register</button>
+</form>
