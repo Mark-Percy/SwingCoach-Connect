@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-import { AuthService } from '../auth-service';
+import { AuthService } from '../service/auth-service';
+import { AuthResponse, UserRegistration } from '../interface/user.interface';
 
 @Component({
   selector: 'app-register',
@@ -53,7 +54,17 @@ export class Register {
   submitRegistration() {
     if(this.registerForm.valid) {
       this.disableSubmit = true;
-      this.authService.signUp(this.registerForm.value);
+      const {confirmPassword, ...backendPayload} = this.registerForm.value;
+      this.authService.signUp(backendPayload as UserRegistration).subscribe({
+        next: (response: AuthResponse) => {
+          console.log('Registration successful', response.message);
+          // TODO: handle success 
+        },
+        error: (errorResponse) => {
+          console.log('Registration Failed', errorResponse);
+          // TODO: handle Error
+        }
+      });
     }
   }
 }

@@ -1,9 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { Register } from './register';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../auth-service';
+import { AuthService } from '../service/auth-service';
 import { By } from '@angular/platform-browser';
+import { delay, of, throwError } from 'rxjs';
 
 describe('Register', () => {
   let component: Register;
@@ -26,6 +27,8 @@ describe('Register', () => {
     fixture = TestBed.createComponent(Register);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    authServiceMock.signUp.and.returnValue(of({ message: 'Success from mock' }));
   });
 
   it('form starts empty', () => {
@@ -58,7 +61,7 @@ describe('Register', () => {
     expect(submitButton.disabled).toBeFalse();
   });
 
-  it('form can be filled and submitted',() => {
+  it('form can be filled and submitted',fakeAsync(() => {
     const submitButton = fixture.debugElement.query(By.css('button')).nativeElement;
 
     expect(submitButton.disabled).toBeFalse();
@@ -88,13 +91,15 @@ describe('Register', () => {
     formElement.dispatchEvent(new Event('submit'));
     fixture.detectChanges();
 
+    tick();
+
     expect(submitButton.disabled).toBeTrue();
 
-    const expectedPayload = {...component.registerForm.value}
+    const {confirmPassword, ...expectedPayload} = {...component.registerForm.value}
     expect(authServiceMock.signUp).toHaveBeenCalledOnceWith(expectedPayload)
-  });
+  }));
 
-  it('form can be filled invalid and submit fails',() => {
+  it('form can be filled invalid and submit fails',fakeAsync(() => {
     component.registerForm.patchValue({
       firstName: 'Test',
       lastName: 'User',
@@ -123,7 +128,54 @@ describe('Register', () => {
     const submitButton = fixture.debugElement.query(By.css('button')).nativeElement;
     expect(submitButton.disabled).toBeFalse();
 
-    const expectedPayload = {...component.registerForm.value}
+    const {confirmPassword, ...expectedPayload} = {...component.registerForm.value}
     expect(authServiceMock.signUp).not.toHaveBeenCalled();
-  });
+  }));
+
+  it('should disable submit button while submitting and re-enable after completion', fakeAsync(() => {
+    component.registerForm.patchValue({
+        firstName: 'Test', lastName: 'User', email: 'loading@test.com',
+        password: 'StrongPassword123!', confirmPassword: 'StrongPassword123!'
+    });
+    fixture.detectChanges();
+    expect(component.registerForm.valid).toBeTrue();
+
+    authServiceMock.signUp.and.returnValue(of({ message: 'Success' }).pipe(delay(100)));
+
+    const submitButton: HTMLButtonElement = fixture.debugElement.query(By.css('button[type="submit"]')).nativeElement;
+
+    submitButton.click();
+    fixture.detectChanges();
+
+    expect(submitButton.disabled).toBeTrue();
+
+    tick(50);
+    fixture.detectChanges();
+    expect(submitButton.disabled).toBeTrue();
+
+    tick(50);
+    fixture.detectChanges();
+
+    expect(authServiceMock.signUp).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should handle submission error from authService', fakeAsync(() => {
+    component.registerForm.patchValue({
+        firstName: 'Test', lastName: 'User', email: 'error@test.com',
+        password: 'StrongPassword123!', confirmPassword: 'StrongPassword123!'
+    });
+    fixture.detectChanges();
+    expect(component.registerForm.valid).toBeTrue();
+
+    const backendErrorMessage = 'Email already registered from backend.';
+    authServiceMock.signUp.and.returnValue(throwError(() => ({ error: { message: backendErrorMessage } })));
+
+    const formElement: HTMLFormElement = fixture.debugElement.query(By.css('form')).nativeElement;
+    formElement.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    tick();
+
+    expect(authServiceMock.signUp).toHaveBeenCalledTimes(1);
+  }));
 });
