@@ -1,18 +1,15 @@
-# Name of your workflow, displayed on GitHub Actions tab
 name: CI/CD Pipeline
 
-# Events that trigger this workflow
 on:
   push:
     branches:
-      - main # Trigger on pushes to the 'main' branch
-      - master # Also include 'master' if that's your primary branch
+      - main
+      - master
   pull_request:
     branches:
       - main
-      - master # Trigger on pull requests targeting main/master
+      - master
 
-# Define the jobs that will run as part of this workflow
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -40,9 +37,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          # ADD THIS LINE: Specify the path to your package-lock.json
-          cache-dependency-path: frontend/package-lock.json # <--- ADD THIS LINE
-        # The path is relative to the repository root
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install Frontend Dependencies
         run: |

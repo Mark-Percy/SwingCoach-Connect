@@ -1,10 +1,17 @@
 package com.swingcoach.swingcoach_connect.service;
 
 import com.swingcoach.swingcoach_connect.dto.auth.RegisterRequest;
+import com.swingcoach.swingcoach_connect.dto.auth.SignInRequest;
 import com.swingcoach.swingcoach_connect.dto.auth.AuthResponse;
 import com.swingcoach.swingcoach_connect.model.User;
 import com.swingcoach.swingcoach_connect.repository.UserRepository;
 
+import org.springframework.security.core.AuthenticationException;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +21,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     @Transactional
@@ -44,5 +53,17 @@ public class AuthService {
     public Object registerUser(Class<RegisterRequest> class1) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'registerUser'");
+    }
+
+    public AuthResponse signIn(SignInRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+            return new AuthResponse("Sign in successful for user: " + request.getEmail());
+        } catch (AuthenticationException e) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
     }
 }
