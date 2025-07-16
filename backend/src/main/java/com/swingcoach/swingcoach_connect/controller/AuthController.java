@@ -1,6 +1,7 @@
 package com.swingcoach.swingcoach_connect.controller;
 
 import com.swingcoach.swingcoach_connect.dto.auth.RegisterRequest;
+import com.swingcoach.swingcoach_connect.dto.auth.SignInRequest;
 import com.swingcoach.swingcoach_connect.dto.auth.AuthResponse;
 import com.swingcoach.swingcoach_connect.service.AuthService;
 import jakarta.validation.Valid;
@@ -33,5 +34,16 @@ public class AuthController {
             return new ResponseEntity<>(new AuthResponse("An Unexpected error occurred during registration."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
+    @PostMapping("/sign-in")
+    public ResponseEntity<AuthResponse> signIn(@Valid @RequestBody SignInRequest request) {
+        try {
+            AuthResponse response = authService.signIn(request);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new AuthResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new AuthResponse("An Unexpected error occurred during registration."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
