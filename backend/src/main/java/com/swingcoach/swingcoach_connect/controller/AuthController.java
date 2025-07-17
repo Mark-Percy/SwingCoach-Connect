@@ -29,9 +29,9 @@ public class AuthController {
             AuthResponse response = authService.registerUser(request);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new AuthResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AuthResponse(e.getMessage(), null), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new AuthResponse("An Unexpected error occurred during registration."), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new AuthResponse("An Unexpected error occurred during registration.", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -41,9 +41,9 @@ public class AuthController {
             AuthResponse response = authService.signIn(request);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new AuthResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AuthResponse(e.getMessage(), null), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new AuthResponse("An Unexpected error occurred during registration."), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new AuthResponse("An Unexpected error occurred during registration.", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -26,6 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 
@@ -33,6 +35,7 @@ import com.swingcoach.swingcoach_connect.dto.auth.AuthResponse;
 import com.swingcoach.swingcoach_connect.dto.auth.RegisterRequest;
 import com.swingcoach.swingcoach_connect.dto.auth.SignInRequest;
 import com.swingcoach.swingcoach_connect.repository.UserRepository;
+import com.swingcoach.swingcoach_connect.service.security.JwtService;
 import com.swingcoach.swingcoach_connect.model.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +49,9 @@ public class AuthServiceTest {
 
     @Mock
     protected AuthenticationManager authenticationManager;
-
+    
+    @Mock
+    protected JwtService jwtService;
 
     @InjectMocks
     private AuthService authService;
@@ -89,6 +94,7 @@ public class AuthServiceTest {
     
             assertNotNull(response, "AuthResponse should not be null");
             assertEquals("Registration Successful! Please verify your email.", response.getMessage());
+            assertEquals(null, response.getToken(), "The token should be as expected");
             
             // Verify interaction with mocks
             verify(userRepository, times(1)).findByEmail(registerRequest.getEmail());
@@ -121,14 +127,30 @@ public class AuthServiceTest {
 
         @BeforeEach
         void setup() {
-            signInRequest = new SignInRequest(
-                "test@example.com",
-                "Password1"
-            );
+           signInRequest = new SignInRequest("signin@example.com", "CorrectPassword123!");
 
+            // Initialize existingUser as a real User object that implements UserDetails
+            existingUser = new User();
+            existingUser.setEmail(signInRequest.getEmail());
+            existingUser.setPasswordHash("hashedPassword");
+            existingUser.setFirstName("Existing");
+            existingUser.setLastName("User");
+            existingUser.setAccountStatus(User.AccountStatus.ACTIVE);
+            existingUser.setIsEmailVerified(true);
+
+            // Mock the successful Authentication object
+            successfulAuthentication = mock(Authentication.class);
+            lenient().when(successfulAuthentication.isAuthenticated()).thenReturn(true);
+            // When getPrincipal() is called on the successfulAuthentication mock, return existingUser
+            lenient().when(successfulAuthentication.getPrincipal()).thenReturn(existingUser); // This is crucial
+
+            // No need to mock JwtService here as it's mocked at the outer class level
+            // and its generateToken is stubbed with lenient() in the outer setUp if needed
+            // (or can be stubbed directly in the test methods if specific behavior is needed)
+
+            // Clear SecurityContextHolder before each test to prevent pollution
             SecurityContextHolder.clearContext();
 
-            successfulAuthentication = mock(Authentication.class);
         }
 
         @Test
@@ -136,18 +158,25 @@ public class AuthServiceTest {
             when(authenticationManager.authenticate(
                 any(UsernamePasswordAuthenticationToken.class)
             )).thenReturn(successfulAuthentication);
-            
+
+            when(jwtService.generateToken(any(UserDetails.class))).thenReturn("dummy.jwt.token");
+
             AuthResponse response = authService.signIn(signInRequest);
 
             assertNotNull(response, "AuthResponse should not be null");
             assertEquals("Sign in successful for user: " + signInRequest.getEmail(), response.getMessage(), "The success message should be as expected");
+            assertNotNull(response.getToken(), "Token should not be null");
+            assertEquals("dummy.jwt.token", response.getToken(), "The token should be the dummy JWT");
 
             verify(authenticationManager, times(1)).authenticate(
-                argThat(token -> 
-                    token.getPrincipal().equals(signInRequest.getEmail()) &&
-                    token.getCredentials().equals(signInRequest.getPassword())
+                argThat(token ->
+                    token instanceof UsernamePasswordAuthenticationToken &&
+                    ((UsernamePasswordAuthenticationToken) token).getPrincipal().equals(signInRequest.getEmail()) &&
+                    ((UsernamePasswordAuthenticationToken) token).getCredentials().equals(signInRequest.getPassword())
                 )
             );
+            verify(successfulAuthentication, times(1)).getPrincipal();
+            verify(jwtService, times(1)).generateToken(any(UserDetails.class));
         }
 
         @Test
