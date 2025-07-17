@@ -1,4 +1,4 @@
-# SingCoach Connect
+# SwingCoach Connect
 A Comprehensive Golf Lesson Booking System
 - GolfLessonBooker is a full-stack web application designed to streamline the process of booking golf lessons for students, managing schedules for coaches and staff, and providing comprehensive administration tools for golf clubs and system administrators.
 
