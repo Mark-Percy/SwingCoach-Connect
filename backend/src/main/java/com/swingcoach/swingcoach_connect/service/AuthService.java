@@ -5,13 +5,16 @@ import com.swingcoach.swingcoach_connect.dto.auth.SignInRequest;
 import com.swingcoach.swingcoach_connect.dto.auth.AuthResponse;
 import com.swingcoach.swingcoach_connect.model.User;
 import com.swingcoach.swingcoach_connect.repository.UserRepository;
+import com.swingcoach.swingcoach_connect.service.security.JwtService;
 
 import org.springframework.security.core.AuthenticationException;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +25,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @Transactional
@@ -47,7 +52,8 @@ public class AuthService {
 
         userRepository.save(user);
 
-        return new AuthResponse("Registration Successful! Please verify your email.");
+
+        return new AuthResponse("Registration Successful! Please verify your email.", null);
     }
 
     public Object registerUser(Class<RegisterRequest> class1) {
@@ -57,11 +63,18 @@ public class AuthService {
 
     public AuthResponse signIn(SignInRequest request) {
         try {
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            
-            return new AuthResponse("Sign in successful for user: " + request.getEmail());
+            context.setAuthentication(authentication);
+            SecurityContextHolder.setContext(context);
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            System.out.println(userDetails.getUsername());
+            String jwtToken = jwtService.generateToken(userDetails);
+            System.out.println(jwtToken);
+
+            return new AuthResponse("Sign in successful for user: " + request.getEmail(), jwtToken);
         } catch (AuthenticationException e) {
             throw new IllegalArgumentException("Invalid email or password");
         }
