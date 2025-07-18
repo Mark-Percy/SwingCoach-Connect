@@ -12,5 +12,11 @@ export interface UserRegistration extends User {
 
 export interface AuthResponse {
     message: string;
+    token: string | null;
+}
+
+export interface UserSignIn {
+    email: string;
+    password: string;
 }
 
