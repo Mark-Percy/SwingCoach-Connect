@@ -66,7 +66,7 @@ public class JwtService {
 	private SecretKey getSigningKey() {
 		byte[] keyBytes = Decoders.BASE64URL.decode(secret);
 		SecretKey key = Keys.hmacShaKeyFor(keyBytes);
-		logger.info("Debug: get SignKey - key hash = " + key.hashCode());
+		logger.debug("Debug: get SignKey - key hash = " + key.hashCode());
 		return key;
 	}
 
