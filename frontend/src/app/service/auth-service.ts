@@ -1,19 +1,31 @@
 import { Injectable } from '@angular/core';
 
 import { environment } from '../../environment/environment';
-import { AuthResponse, UserRegistration } from '../interface/user.interface';
+import { AuthResponse, UserRegistration, UserSignIn } from '../interface/user.interface';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root',
+	providedIn: 'root',
 })
 export class AuthService {
 
-  private authEndpoint = `${environment.apiUrl}/auth`;
+	private authEndpoint = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) {}
+	constructor (private http: HttpClient) {}
 
-  signUp(backendPayload: UserRegistration) {
-    return this.http.post<AuthResponse>(`${this.authEndpoint}/register`, backendPayload)
-  }
+	signUp (signUpPayload: UserRegistration) {
+		return this.http.post<AuthResponse>(`${this.authEndpoint}/register`, signUpPayload);
+	}
+
+	signIn (signInPayload: UserSignIn) {
+		return this.http.post<AuthResponse>(`${this.authEndpoint}/sign-in`, signInPayload);		
+	}
+
+	getJwtToken () {
+		return sessionStorage.getItem('jwtToken');
+	}
+
+	setJwtToken (token: string) {
+		sessionStorage.setItem('jwtToken', token);	
+	}
 }
