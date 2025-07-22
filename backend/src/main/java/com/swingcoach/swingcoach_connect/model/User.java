@@ -7,8 +7,6 @@ import lombok.ToString;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +26,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
-	private final static Logger logger = LoggerFactory.getLogger(User.class);
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(

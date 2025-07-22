@@ -6,8 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository // Marks this interface as a Spring Data JPA repository
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    // Custom method to find a user by email
     Optional<User> findByEmail(String email);
 }

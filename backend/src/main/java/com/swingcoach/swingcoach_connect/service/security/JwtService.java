@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.nimbusds.oauth2.sdk.auth.Secret;
-import com.swingcoach.swingcoach_connect.filter.JwtAuthenticationFilter;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
