@@ -87,8 +87,7 @@ public class AuthServiceTest {
                 User user = invocation.getArgument(0);
                 user.setId(1L);
                 return user;
-            }
-            );
+            });
             
             AuthResponse response = authService.registerUser(registerRequest);
     
@@ -142,13 +141,7 @@ public class AuthServiceTest {
             successfulAuthentication = mock(Authentication.class);
             lenient().when(successfulAuthentication.isAuthenticated()).thenReturn(true);
             // When getPrincipal() is called on the successfulAuthentication mock, return existingUser
-            lenient().when(successfulAuthentication.getPrincipal()).thenReturn(existingUser); // This is crucial
-
-            // No need to mock JwtService here as it's mocked at the outer class level
-            // and its generateToken is stubbed with lenient() in the outer setUp if needed
-            // (or can be stubbed directly in the test methods if specific behavior is needed)
-
-            // Clear SecurityContextHolder before each test to prevent pollution
+            lenient().when(successfulAuthentication.getPrincipal()).thenReturn(existingUser);
             SecurityContextHolder.clearContext();
 
         }
