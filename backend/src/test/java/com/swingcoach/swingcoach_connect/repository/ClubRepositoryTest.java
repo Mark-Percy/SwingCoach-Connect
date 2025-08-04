@@ -8,8 +8,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,7 +18,6 @@ import com.swingcoach.swingcoach_connect.model.Club;
 @DataJpaTest
 @ActiveProfiles("test")
 public class ClubRepositoryTest {
-	private static final Logger logger = LoggerFactory.getLogger(ClubRepositoryTest.class);
 
 	@Autowired
 	private ClubRepository clubRepository;
@@ -33,7 +30,7 @@ public class ClubRepositoryTest {
 		club.setName("test Club");
 		club.setNumberOFBays(4);
 		club.setCompanyName("test Company");
-		club.setClubStatus(Club.ClubStatus.PENDING_VERIFICATION);
+		club.setStatus(Club.ClubStatus.PENDING_VERIFICATION);
 		club.setAddressPostCode("L23 0dws");
 		club.setAddressStreet("ddsafdsa");
 	}
@@ -51,7 +48,7 @@ public class ClubRepositoryTest {
 		assertEquals(club.getName(), retrievedClub.getName());
 		assertEquals(club.getNumberOFBays(), retrievedClub.getNumberOFBays());
 		assertEquals(club.getCompanyName(), retrievedClub.getCompanyName());
-		assertEquals(club.getClubStatus(), retrievedClub.getClubStatus());
+		assertEquals(club.getStatus(), retrievedClub.getStatus());
 		assertEquals(club.getAddressPostCode(), retrievedClub.getAddressPostCode());
 		assertEquals(club.getAddressStreet(), retrievedClub.getAddressStreet());
 	}

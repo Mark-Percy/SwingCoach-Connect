@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.doubleThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,32 +51,32 @@ public class UserServiceTest {
 	void test_getExistingUser() {
 		dummyUser.setAccountStatus(AccountStatus.ACTIVE);
 
-		when(userRepository.findByEmailStatus(dummyUser.getEmail(), AccountStatus.ACTIVE)).thenReturn(Optional.of(dummyUser));
+		when(userRepository.findByEmailAndAccountStatus(dummyUser.getEmail(), AccountStatus.ACTIVE)).thenReturn(Optional.of(dummyUser));
 		Optional<User> userOptional = userService.findByEmail(dummyUser.getEmail());
 		assertTrue(userOptional.isPresent());
 		assertEquals(dummyUser.getEmail(), userOptional.get().getEmail());
-		verify(userRepository, times(1)).findByEmailStatus(dummyUser.getEmail(), AccountStatus.ACTIVE);
+		verify(userRepository, times(1)).findByEmailAndAccountStatus(dummyUser.getEmail(), AccountStatus.ACTIVE);
 	}
 
 	@Test
 	void test_getExistingInactiveUser() {
 		dummyUser.setAccountStatus(AccountStatus.PENDING_EMAIL_VERIFICATION);
 
-		when(userRepository.findByEmailStatus(dummyUser.getEmail(), AccountStatus.ACTIVE)).thenReturn(Optional.empty());
+		when(userRepository.findByEmailAndAccountStatus(dummyUser.getEmail(), AccountStatus.ACTIVE)).thenReturn(Optional.empty());
 
 		Optional<User> userOptional = userService.findByEmail(dummyUser.getEmail());
 		assertFalse(userOptional.isPresent());
-		verify(userRepository, times(1)).findByEmailStatus(dummyUser.getEmail(), AccountStatus.ACTIVE);
+		verify(userRepository, times(1)).findByEmailAndAccountStatus(dummyUser.getEmail(), AccountStatus.ACTIVE);
 	}
 
 	@Test
 	void test_getUserNotFound() {
 		dummyUser.setAccountStatus(AccountStatus.PENDING_EMAIL_VERIFICATION);
 
-		when(userRepository.findByEmailStatus("Test@Testing.com", AccountStatus.ACTIVE)).thenReturn(Optional.empty());
+		when(userRepository.findByEmailAndAccountStatus("Test@Testing.com", AccountStatus.ACTIVE)).thenReturn(Optional.empty());
 
 		Optional<User> userOptional = userService.findByEmail("Test@Testing.com");
 		assertFalse(userOptional.isPresent());
-		verify(userRepository, times(1)).findByEmailStatus("Test@Testing.com", AccountStatus.ACTIVE);
+		verify(userRepository, times(1)).findByEmailAndAccountStatus("Test@Testing.com", AccountStatus.ACTIVE);
 	}
 }

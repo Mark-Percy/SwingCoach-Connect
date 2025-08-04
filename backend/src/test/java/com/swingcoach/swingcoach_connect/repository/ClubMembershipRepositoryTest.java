@@ -57,7 +57,7 @@ public class ClubMembershipRepositoryTest {
 		testClub.setAddressPostCode("testClub");
 		testClub.setAddressStreet("testClub");
 		testClub.setNumberOFBays(4);
-		testClub.setClubStatus(ClubStatus.PENDING_VERIFICATION);
+		testClub.setStatus(ClubStatus.PENDING_VERIFICATION);
 		logger.info("Test data finished");
 	}
 	

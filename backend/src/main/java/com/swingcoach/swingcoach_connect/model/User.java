@@ -36,7 +36,6 @@ public class User implements UserDetails {
 	@ToString.Exclude
 	private Set<Role> roles = new HashSet<>();
 
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

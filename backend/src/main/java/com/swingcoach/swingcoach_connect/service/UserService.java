@@ -20,7 +20,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email){
-        return this.userRepository.findByEmailStatus(email, AccountStatus.ACTIVE);
+        return this.userRepository.findByEmailAndAccountStatus(email, AccountStatus.ACTIVE);
     }
     
 }
